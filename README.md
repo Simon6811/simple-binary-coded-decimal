@@ -29,3 +29,10 @@ The trade-off is simplicity over generality: only non-negative integers are supp
 - **Decoding is strict.** A nibble or byte with a value greater than 9 raises `BCDOverflowError` rather than silently masking corrupt data.
 - **`bool` is rejected as input.** Although `bool` is a subclass of `int` in Python, accepting it would introduce ambiguity (`True` encoding to `0x01`), so it is explicitly rejected.
 - **Trailing zeros are significant.** `PackedBCD.encode(1200)` produces `b'\x12\x00'`, not `b'\x12'`, because BCD encodes digits, not numeric magnitude alone.
+
+## Design notes
+
+The window stores values eagerly rather than keeping running aggregates. Running
+sums drift with floating point over long streams, and recomputing from a small
+buffer is cheap enough that the drift is not worth the speed.
+
